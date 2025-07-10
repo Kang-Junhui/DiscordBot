@@ -17,7 +17,7 @@ bot = commands.Bot(
 
 @bot.event
 async def on_ready():
-    print(f'{bot.user} 준비 완료료!')
+    print(f'{bot.user} 준비 완료!')
 
 async def main():
     await load_all_commands(bot)
