@@ -92,6 +92,20 @@ class YTstream(commands.Cog, name='음악 재생'):
         self.bot = bot
         self.guild_states = {}  # {guild_id: GuildState}
 
+    async def _force_leave(self, ctx):
+        state = self.get_state(ctx.guild.id)
+        vc = state.voice_client
+        if vc:
+            state.cleanup_current()
+            state.current = None
+            state.loop_queue = False
+            state.original_queue.clear()
+            state.queue.clear()
+            await vc.disconnect()
+            state.voice_client = None
+            await ctx.send(embed=MsgBox.msgBox("음성채팅에 아무도 없어 자동 종료합니다."))
+        return
+    
     def get_state(self, guild_id):
         if guild_id not in self.guild_states:
             self.guild_states[guild_id] = GuildState()
@@ -99,6 +113,11 @@ class YTstream(commands.Cog, name='음악 재생'):
 
     async def play_next(self, ctx):
         state = self.get_state(ctx.guild.id)
+
+        vch = state.voice_client.channel
+        non_bot_memebers = [m for m in vch.members if not m.bot]
+        if not non_bot_memebers:
+            return await self._force_leave(ctx)
         
         if not state.queue and state.loop_queue and state.original_queue:
             state.queue = state.original_queue.copy()
