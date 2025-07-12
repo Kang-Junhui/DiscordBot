@@ -5,9 +5,8 @@
 
 디스코드에서 음악 틀어주는 봇들 리소스 너무 많이 써서 작동하지 않을 때 홈서버에 추가해서 개인적으로 쓰세요.
 
----
-### Docker 빌드 후 run 할 때 -e <DISCORD_TOKEN> 입력 필수!!!
----
+**Docker 빌드 후 run 할 때 -e <DISCORD_TOKEN> 입력 필수!!!**
+
 명령어 세트 commands 폴더에 넣은 뒤 모듈화  
 
 bind mount 옵션 허용 후 commands에 명령어 파일 추가 가능  
