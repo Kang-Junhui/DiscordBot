@@ -284,11 +284,10 @@ class YTstream(commands.Cog, name='음악 재생'):
                         state.original_queue.extend(play_lists)
                 else:
                     music = YTDLHelper.get_info_and_url(query)
-                    if music[0][0] is None:
-                        await ctx.send("이상해요")
-                    state.queue.extend(music)
-                    if state.loop_queue:
-                        state.original_queue.extend(music)
+                    if not music[0][0] is None:
+                        state.queue.extend(music)
+                        if state.loop_queue:
+                            state.original_queue.extend(music)
                 await prep_msg.delete()
                 
             if not state.voice_client.is_playing() and not state.voice_client.is_paused():
