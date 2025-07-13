@@ -18,13 +18,14 @@ class YTDLHelper:
     @staticmethod
     def get_info_and_url(url: str):
         ydl_opts = {
-            'format': 'bestaudio[ext=m4a]/best',
+            'format': 'bestaudio[ext=m4a]',
             'quiet': True,
             'noplaylist': True,
             'no_warnings': True,
             'skip_download': True,
             # 'extractor_args': {'youtube':['player_client=android']},
             'cache_dir': False,
+            'ignoreerrors': True
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -32,7 +33,8 @@ class YTDLHelper:
         
         url2 = YTDLHelper.extract_audio_url(info)
         
-        if not url2:
+        if url2 is None:
+            info = None
             raise discord.ClientException(MsgBox.msgBox("🎵 오디오 스트리밍 URL을 찾을 수 없습니다."))
         
         return [(info, url2)]
@@ -48,13 +50,14 @@ class YTDLHelper:
             'skip_download': True,
         }
         ydl_opts2 = {
-            'format': 'bestaudio[ext=m4a]/best',
+            'format': 'bestaudio[ext=m4a]',
             'quiet': True,
             'noplaylist': True,
             'no_warnings': True,
             'skip_download': True,
             # 'extractor_args': {'youtube':['player_client=android']},
             'cache_dir': False,
+            'ignoreerrors': True,
         }
 
         results = []
@@ -63,12 +66,15 @@ class YTDLHelper:
             info = ydl.extract_info(url, download=False)
         
         with yt_dlp.YoutubeDL(ydl_opts2) as ydl:
-            entries = info.get('entries', [])
+            entries = info.get('entries', [])[:7]
             for entry in entries:
                 if entry and entry.get('url'):
                     try:
                         v_url = entry.get('url')
                         info2 = ydl.extract_info(v_url, download=False)
+                        if info2 is None:
+                            print(f"[⚠️ 건너뜀] {entry.get('title', 'Unknown')} - 정보 추출 실패")
+                            continue
                         url2 = YTDLHelper.extract_audio_url(info2)
                         results.append((info2, url2))
                     except Exception as e:
@@ -190,7 +196,7 @@ class YTstream(commands.Cog, name='음악 재생'):
                 executable='/usr/bin/ffmpeg',
                 source=url,
                 before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
-                options='-vn -ac 2 -ar 48000 -f opus'
+                options='-vn -f opus'
             )
             # source = discord.PCMVolumeTransformer(ffmpeg_audio, volume=0.3)
             state.current = (source, info, url)
@@ -206,7 +212,7 @@ class YTstream(commands.Cog, name='음악 재생'):
             state.voice_client = None
         return
 
-    @commands.command(help='유튜브 링크 또는 검색어를 입력어를 입력해 재생 대기열에 추가합니다.')
+    @commands.command(help='유튜브 링크 또는 검색어를 입력어를 입력해 재생 대기열에 추가합니다.\n재생목록의 경우 7곡까지만 추가됩니다.')
     async def play(self, ctx, *, query: str):
         state = self.get_state(ctx.guild.id)
         if state.queue_lock.locked():
@@ -278,6 +284,8 @@ class YTstream(commands.Cog, name='음악 재생'):
                         state.original_queue.extend(play_lists)
                 else:
                     music = YTDLHelper.get_info_and_url(query)
+                    if music[0][0] is None:
+                        await ctx.send("이상해요")
                     state.queue.extend(music)
                     if state.loop_queue:
                         state.original_queue.extend(music)
@@ -364,7 +372,7 @@ class YTstream(commands.Cog, name='음악 재생'):
         if state.queue_lock.locked():
             return await ctx.send("⚠️ 재생목록을 추가하는 중입니다. 나중에 다시 시도해주세요.")
         
-        if state.voice_client or (not state.queue and state.current):
+        if state.voice_client or (not state.queue and not state.current):
             return await ctx.send(embed=MsgBox.msgBox('음성 채널에 연결되어 있지 않거나 노래 재생 중이 아닙니다.'))
 
         _, c_info, _ = state.current
