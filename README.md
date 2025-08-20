@@ -1,6 +1,5 @@
 # DiscordBot
-## python 3.11-slim, discord.py(2.5.2), ~~yt-dlp(2025.06.30)~~ 기준
-※ yt-dlp의 경우 최신버전이 아니면 스트리밍 링크를 못 따오는 오류 있음 항상 최신 버전으로 유지해줄 것  
+## python 3.11-slim, discord.py(2.5.2), yt-dlp(2025.06.30) 기준
 
 디스코드 음성채팅 사용하려면 PyNaCl(버전 1.5.0) 설치 필요함.  
 
