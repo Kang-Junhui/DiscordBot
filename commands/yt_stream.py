@@ -205,6 +205,7 @@ class YTstream(commands.Cog, name='음악 재생'):
         else:
             await ctx.send(embed=MsgBox.msgBox("🛑 대기열이 비어 있어 재생을 종료합니다."))
             state.current = None
+            state.cleanup_current()
             state.loop_queue = False
             state.original_queue.clear()
             state.queue.clear()
