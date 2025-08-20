@@ -27,3 +27,6 @@ skip: 건너뛰기
 stop: 재생목록 삭제 및 음악 중지  
 
 _기본적으로 재생목록 기능 포함 및 음악 재생 없을 시 자동퇴장 기능 포함, leave는 강제퇴장_  
+## 오류 목록
+- ~~play_next에서 대기열 전부 재생 이후 퇴장 -> ++play로 재생할 때 <'NoneType' object has no attribute 'get'> 오류 발생~~  
+  - 음성채널에서 봇 퇴장시 항상 ffmpeg의 cleanup 함수 적용해줘야 해당 에러가 나오지 않음.
