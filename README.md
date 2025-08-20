@@ -10,7 +10,6 @@
 
 명령어 세트 commands 폴더에 넣은 뒤 모듈화  
 
----
 bind mount 옵션 허용 후 commands에 명령어 파일 추가 가능  
 
 \_\_init\_\_.py에서 미리 함수로 묶어 bot.py에서 commands 임포트 후 바로 사용할 수 있도록 처리
